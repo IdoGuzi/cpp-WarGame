@@ -19,6 +19,7 @@ void Sniper::ability(vector<vector<Soldier*>>& b, std::pair<int,int> size, std::
             }
         }
     }
+    if (strongestEnemy.first<0 || strongestEnemy.second<0) return;
     b[strongestEnemy.first][strongestEnemy.second]->setHealth(b[strongestEnemy.first][strongestEnemy.second]->getHealth()-this->getDamage());
     if (b[strongestEnemy.first][strongestEnemy.second]->getHealth()<=0){
         delete b[strongestEnemy.first][strongestEnemy.second];

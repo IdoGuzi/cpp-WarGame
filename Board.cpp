@@ -14,6 +14,8 @@ Soldier* WarGame::Board::operator[](std::pair<int,int> location) const{
 }
 
 void WarGame::Board::move(uint player_number, std::pair<int,int> source, Board::MoveDIR direction){
+    if (source.first<0 || source.first>=this->board.size() || source.second<0 || source.second>=this->board[0].size())
+        throw invalid_argument("ERROR: source of soldier if out of bound");
     Soldier *temp = (*this)[source];
     if (temp==nullptr) throw std::invalid_argument("no soldier in this spot");
     if (temp->getPlayer()!=player_number) throw invalid_argument("this soldier does not belong to this player");
