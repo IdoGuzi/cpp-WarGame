@@ -155,9 +155,9 @@ TEST_CASE("throws"){
     CHECK_THROWS(b.move(1,{0,1},Board::MoveDIR::Up)); //no soldier in {0,1}
     b.move(1,{0,0},Board::MoveDIR::Up);
     CHECK_THROWS(b.move(1,{1,0},Board::MoveDIR::Right)); //{1,1} is already occupied with p2 soldier
-    CHECK_THROWS(b.has_soldiers(0));
-    CHECK_THROWS(b.has_soldiers(-1));
-    CHECK_THROWS(b.has_soldiers(3));
+    CHECK(!b.has_soldiers(0));
+    CHECK(!b.has_soldiers(-1));
+    CHECK(!b.has_soldiers(3));
     for (int iRow=0; iRow<2; ++iRow) {
 		for (int iCol=0; iCol<2; ++iCol) {
 			Soldier* soldier = b[{iRow,iCol}];
@@ -176,11 +176,11 @@ TEST_CASE("commander"){
     CHECK_NOTHROW(b.move(2,{0,1},Board::MoveDIR::Right));
     CHECK(b[{1,1}]->getHealth()==140);
     CHECK_NOTHROW(b.move(1,{1,1},Board::MoveDIR::Right));
-    CHECK(b[{0,2}]->getHealth()==50);
+    CHECK(b[{0,2}]->getHealth()==40);
     CHECK_NOTHROW(b.move(2,{0,2},Board::MoveDIR::Left));
     CHECK((b[{1,2}]->getHealth()==130 || b[{0,0}]->getHealth()==90));
     CHECK_NOTHROW(b.move(1,{1,2},Board::MoveDIR::Left));
-    CHECK(b[{0,1}]->getHealth()==20); //60
+    CHECK(b[{0,1}]->getHealth()==10); //60
     CHECK_NOTHROW(b.move(2,{0,1},Board::MoveDIR::Right));
     CHECK(b[{1,1}]->getHealth()==130);
     CHECK(b.has_soldiers(2)==true);
@@ -206,9 +206,9 @@ TEST_CASE("sniper && sniper commander"){
     CHECK_NOTHROW(b.move(2,{1,2},Board::MoveDIR::Down));
     CHECK(b[{0,2}]->getHealth()==50);
     CHECK_NOTHROW(b.move(2,{0,2},Board::MoveDIR::Left)); //player 2 moved twice (for the test),may cause problems
-    CHECK(b[{1,0}]->getHealth()==90);
+    CHECK(b[{1,0}]->getHealth()==70);
     CHECK(b.has_soldiers(1));
-    CHECK(b.has_soldiers(2)); //70
+    CHECK(b.has_soldiers(2));
     CHECK_NOTHROW(b.move(1,{1,0},Board::MoveDIR::Down));
     CHECK(!b.has_soldiers(2));
     CHECK(b.has_soldiers(1));
@@ -226,18 +226,24 @@ TEST_CASE("paramedic & paramdicCommander"){
     CHECK(b.has_soldiers(1));
     CHECK(b.has_soldiers(2));
     CHECK_NOTHROW(b.move(1,{2,0},Board::MoveDIR::Right));
+    CHECK(b[{2,3}]->getHealth()==90);
     CHECK_NOTHROW(b.move(2,{2,3},Board::MoveDIR::Left));
     CHECK(b[{2,1}]->getHealth()==90);
     CHECK_NOTHROW(b.move(1,{2,1},Board::MoveDIR::Left));
+    CHECK(b[{2,2}]->getHealth()==80);
     CHECK_NOTHROW(b.move(2,{2,2},Board::MoveDIR::Right));
     CHECK_NOTHROW(b.move(1,{0,0},Board::MoveDIR::Up));
     CHECK(b[{2,0}]->getHealth()==100);
     CHECK_NOTHROW(b.move(1,{2,0},Board::MoveDIR::Right));
+    CHECK(b[{2,3}]->getHealth()==70);
     CHECK_NOTHROW(b.move(2,{2,3},Board::MoveDIR::Left));
     CHECK(b[{2,1}]->getHealth()==90);
     CHECK_NOTHROW(b.move(1,{2,1},Board::MoveDIR::Left));
+    CHECK(b[{2,2}]->getHealth()==60);
     CHECK_NOTHROW(b.move(2,{2,2},Board::MoveDIR::Right));
+    CHECK(b[{2,0}]->getHealth()==80);
     CHECK_NOTHROW(b.move(1,{3,0},Board::MoveDIR::Right));
+    CHECK(b[{3,3}]->getHealth()==90);
     CHECK_NOTHROW(b.move(2,{3,3},Board::MoveDIR::Left));
     CHECK(b[{3,1}]->getHealth()==90);
     CHECK_NOTHROW(b.move(1,{3,1},Board::MoveDIR::Left));
@@ -245,30 +251,23 @@ TEST_CASE("paramedic & paramdicCommander"){
     CHECK_NOTHROW(b.move(1,{5,0},Board::MoveDIR::Down));
     CHECK((b[{2,0}]->getHealth()==100 && b[{3,0}]->getHealth()==100));
     CHECK_NOTHROW(b.move(1,{2,0},Board::MoveDIR::Right));
+    CHECK(b[{2,1}]->getHealth()==100);
     CHECK_NOTHROW(b.move(2,{2,3},Board::MoveDIR::Left));
-    CHECK(b[{2,1}]->getHealth()==90); //80
+    CHECK(b[{2,1}]->getHealth()==90);
     CHECK_NOTHROW(b.move(1,{2,1},Board::MoveDIR::Up));
     CHECK_NOTHROW(b.move(2,{2,2},Board::MoveDIR::Right));
     //player 2 doing second move (for the test), may cause problem later
     CHECK_NOTHROW(b.move(2,{2,3},Board::MoveDIR::Right));
     CHECK_NOTHROW(b.move(1,{3,1},Board::MoveDIR::Right));
-    CHECK(b[{3,3}]->getHealth()==90);
+    CHECK(b[{3,3}]->getHealth()==70);
     CHECK_NOTHROW(b.move(2,{3,3},Board::MoveDIR::Up));
     CHECK_NOTHROW(b.move(1,{3,2},Board::MoveDIR::Up));
-    CHECK(b[{4,3}]->getHealth()==80);
-    CHECK_NOTHROW(b.move(2,{4,3},Board::MoveDIR::Up));
-    CHECK_NOTHROW(b.move(1,{4,2},Board::MoveDIR::Up));
-    CHECK(b[{5,3}]->getHealth()==70);
-    cout << "before" << endl;
-    CHECK_THROWS(b.move(2,{5,3},Board::MoveDIR::Up));
-    cout << "after" << endl;
-    CHECK_THROWS(b.move(1,{5,2},Board::MoveDIR::Up));
-    CHECK_NOTHROW(b.move(2,{5,3},Board::MoveDIR::Down));
-    CHECK_NOTHROW(b.move(1,{5,2},Board::MoveDIR::Down));
     CHECK(b[{4,3}]->getHealth()==60);
     CHECK_NOTHROW(b.move(2,{4,3},Board::MoveDIR::Up));
     CHECK_NOTHROW(b.move(1,{4,2},Board::MoveDIR::Up));
     CHECK(b[{5,3}]->getHealth()==50);
+    CHECK_THROWS(b.move(2,{5,3},Board::MoveDIR::Up));
+    CHECK_THROWS(b.move(1,{5,2},Board::MoveDIR::Up));
     CHECK_NOTHROW(b.move(2,{5,3},Board::MoveDIR::Down));
     CHECK_NOTHROW(b.move(1,{5,2},Board::MoveDIR::Down));
     CHECK(b[{4,3}]->getHealth()==40);
@@ -282,42 +281,24 @@ TEST_CASE("paramedic & paramdicCommander"){
     CHECK_NOTHROW(b.move(1,{4,2},Board::MoveDIR::Up));
     CHECK(b[{5,3}]->getHealth()==10);
     CHECK_NOTHROW(b.move(2,{5,3},Board::MoveDIR::Down));
-    CHECK_NOTHROW(b.move(1,{5,2},Board::MoveDIR::Down));
+    CHECK(b[{5,2}]==nullptr);
+    CHECK_NOTHROW(b.move(1,{3,0},Board::MoveDIR::Right));
     CHECK(b[{4,3}]==nullptr);
-    CHECK_NOTHROW(b.move(1,{3,0},Board::MoveDIR::Down));
+    CHECK_NOTHROW(b.move(1,{3,1},Board::MoveDIR::Down)); //player 1 playing twice
+    CHECK(b[{2,4}]->getHealth()==30);
     CHECK_NOTHROW(b.move(2,{2,4},Board::MoveDIR::Left));
-    CHECK_NOTHROW(b.move(1,{2,0},Board::MoveDIR::Right));
-    CHECK_NOTHROW(b.move(2,{2,3},Board::MoveDIR::Left));
+    CHECK(b[{2,1}]->getHealth()==90);
     CHECK_NOTHROW(b.move(1,{2,1},Board::MoveDIR::Right));
-    CHECK(b[{2,2}]->getHealth()==90);
-    CHECK_NOTHROW(b.move(2,{2,2},Board::MoveDIR::Down));
-    CHECK_NOTHROW(b.move(1,{2,1},Board::MoveDIR::Down));
-    CHECK(b[{1,2}]->getHealth()==80);
-    CHECK_NOTHROW(b.move(2,{1,2},Board::MoveDIR::Up));
-    CHECK_NOTHROW(b.move(1,{1,1},Board::MoveDIR::Up));
-    CHECK(b[{2,2}]->getHealth()==70);
-    CHECK_NOTHROW(b.move(2,{2,2},Board::MoveDIR::Down));
-    CHECK_NOTHROW(b.move(1,{2,1},Board::MoveDIR::Down));
-    CHECK(b[{1,2}]->getHealth()==60);
-    CHECK_NOTHROW(b.move(2,{1,2},Board::MoveDIR::Up));
-    CHECK_NOTHROW(b.move(1,{1,1},Board::MoveDIR::Up));
-    CHECK(b[{2,2}]->getHealth()==50);
-    CHECK_NOTHROW(b.move(2,{2,2},Board::MoveDIR::Down));
-    CHECK_NOTHROW(b.move(1,{2,1},Board::MoveDIR::Down));
-    CHECK(b[{1,2}]->getHealth()==40);
-    CHECK_NOTHROW(b.move(2,{1,2},Board::MoveDIR::Up));
-    CHECK_NOTHROW(b.move(1,{1,1},Board::MoveDIR::Up));
-    CHECK(b[{2,2}]->getHealth()==30);
-    CHECK_NOTHROW(b.move(2,{2,2},Board::MoveDIR::Down));
-    CHECK_NOTHROW(b.move(1,{2,1},Board::MoveDIR::Down));
-    CHECK(b[{1,2}]->getHealth()==20);
-    CHECK_NOTHROW(b.move(2,{1,2},Board::MoveDIR::Up));
-    CHECK_NOTHROW(b.move(1,{1,1},Board::MoveDIR::Up));
-    CHECK(b[{2,2}]->getHealth()==10);
-    CHECK_NOTHROW(b.move(2,{2,2},Board::MoveDIR::Down));
+    CHECK(b[{2,3}]->getHealth()==20);
+    CHECK_NOTHROW(b.move(2,{2,3},Board::MoveDIR::Right));
+    CHECK(b[{2,2}]->getHealth()==80);
+    CHECK_NOTHROW(b.move(1,{2,2},Board::MoveDIR::Left));
+    CHECK(b[{2,4}]->getHealth()==10);
+    CHECK_NOTHROW(b.move(2,{2,4},Board::MoveDIR::Left));
+    CHECK(b[{2,1}]->getHealth()==70);
     CHECK(b.has_soldiers(2));
     CHECK_NOTHROW(b.move(1,{2,1},Board::MoveDIR::Down));
-    CHECK(b[{1,2}]==nullptr);
+    CHECK(b[{2,3}]==nullptr);
     CHECK(!b.has_soldiers(2));
     CHECK(b.has_soldiers(1));
     for (int iRow=0; iRow<6; ++iRow) {

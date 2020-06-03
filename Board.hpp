@@ -1,3 +1,4 @@
+#pragma once
 /**
  * Header file for the board of the war game.
  * 
